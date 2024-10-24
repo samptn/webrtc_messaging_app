@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:webrtc_messaging_app/routes/app_routes.dart';
 
 void kPrint(Object? data) {
   if (kDebugMode) {
@@ -24,7 +26,18 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        actions: [
+          //call button
+          IconButton(
+            onPressed: () {
+              kPrint("Call button pressed");
+              context.push(AppRoutes.calling);
+            },
+            icon: const Icon(Icons.call),
+          ),
+        ],
+      ),
       body: Column(
         children: [
           Expanded(

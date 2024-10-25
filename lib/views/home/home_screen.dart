@@ -13,7 +13,7 @@ class HomeScreen extends StatelessWidget {
       body: ListView(
         children: [
           ...List.generate(
-            10,
+            10,     
             (index) => const RoomItem(),
           ),
         ],

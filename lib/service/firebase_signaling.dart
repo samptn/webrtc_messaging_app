@@ -22,14 +22,12 @@ class Signaling {
   RTCPeerConnection? peerConnection;
   MediaStream? localStream;
   MediaStream? remoteStream;
-  String? roomId;
   String? currentRoomText;
   StreamStateCallback? onAddRemoteStream;
 
-  Future<String> startCall() async {
+  Future<String> startCall({required String roomId}) async {
     var db = FirebaseFirestore.instance;
-    var roomRef = db.collection('rooms').doc();
-
+    var roomRef = db.collection('rooms').doc(roomId);
     kPrint('Create PeerConnection with configuration: $configuration');
 
     peerConnection = await createPeerConnection(configuration);
@@ -54,10 +52,12 @@ class Signaling {
     await peerConnection?.setLocalDescription(offer);
     kPrint('Created offer: $offer');
 
-    Map<String, dynamic> roomWithOffer = {'offer': offer.toMap()};
+    Map<String, dynamic> roomWithOffer = {
+      'offer': offer.toMap(),
+    };
 
     await roomRef.set(roomWithOffer);
-    var roomId = roomRef.id;
+    // var roomId = roomRef.id;
     kPrint('New room created with SDK offer. Room ID: $roomId');
     currentRoomText = 'Current room is $roomId - You are the caller!';
     // Created a Room
@@ -123,8 +123,8 @@ class Signaling {
 
       registerPeerConnectionListeners();
 
-      localStream?.getTracks().forEach((track) {
-        peerConnection?.addTrack(track, localStream!);
+      localStream?.getTracks().forEach((track) async {
+        await peerConnection?.addTrack(track, localStream!);
       });
 
       // Code for collecting ICE candidates below
@@ -141,9 +141,9 @@ class Signaling {
 
       peerConnection?.onTrack = (RTCTrackEvent event) {
         kPrint('Got remote track: ${event.streams[0]}');
-        event.streams[0].getTracks().forEach((track) {
+        event.streams[0].getTracks().forEach((track) async {
           kPrint('Add a track to the remoteStream: $track');
-          remoteStream?.addTrack(track);
+          await remoteStream?.addTrack(track);
         });
       };
 
@@ -206,7 +206,7 @@ class Signaling {
     remoteVideo.srcObject = await createLocalMediaStream('key');
   }
 
-  Future<void> hangUp(RTCVideoRenderer localVideo) async {
+  Future<void> hangUp(RTCVideoRenderer localVideo, {String? roomId}) async {
     List<MediaStreamTrack> tracks = localVideo.srcObject!.getTracks();
     for (var track in tracks) {
       track.stop();

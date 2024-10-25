@@ -26,25 +26,31 @@ class _CallingScreenState extends State<CallingScreen>
     //   vsync: this,
     // );
     // _controller.repeat();
+    _initCall();
+    super.initState();
+  }
 
-    _localRenderer.initialize();
-    _remoteRenderer.initialize();
+  _initCall() async {
+    await _localRenderer.initialize();
+    await _remoteRenderer.initialize();
 
     signaling.onAddRemoteStream = ((stream) {
       setState(() {
         _remoteRenderer.srcObject = stream;
       });
     });
-
-    super.initState();
   }
 
   @override
   void dispose() {
-    _localRenderer.dispose();
-    _remoteRenderer.dispose();
     // _controller.dispose();
+    _disposeRenderer();
     super.dispose();
+  }
+
+  _disposeRenderer() async {
+    await _localRenderer.dispose();
+    await _remoteRenderer.dispose();
   }
 
   @override

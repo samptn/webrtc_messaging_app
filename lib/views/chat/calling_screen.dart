@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../../service/firebase_signaling.dart';
@@ -18,7 +19,6 @@ class _CallingScreenState extends State<CallingScreen>
   final signaling = Signaling();
   final _localRenderer = RTCVideoRenderer();
   final _remoteRenderer = RTCVideoRenderer();
-  String roomId = "123";
 
   @override
   void initState() {
@@ -41,6 +41,7 @@ class _CallingScreenState extends State<CallingScreen>
         _remoteRenderer.srcObject = stream;
       });
     });
+    await signaling.openUserMedia(_localRenderer, _remoteRenderer);
   }
 
   @override
@@ -57,6 +58,8 @@ class _CallingScreenState extends State<CallingScreen>
 
   @override
   Widget build(BuildContext context) {
+    var queryParams = GoRouterState.of(context).uri.queryParameters;
+    var roomId = queryParams['roomId'] ?? 'default';
     return Scaffold(
       appBar: AppBar(
         title: GestureDetector(
@@ -77,6 +80,7 @@ class _CallingScreenState extends State<CallingScreen>
                   Expanded(
                     child: CallStreamWidget(
                       renderer: _localRenderer,
+                      isMirror: true,
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -87,12 +91,6 @@ class _CallingScreenState extends State<CallingScreen>
                   ),
                 ],
               ),
-            ),
-            CustomButton(
-              label: "Open Media",
-              onPressed: () async {
-                await signaling.openUserMedia(_localRenderer, _remoteRenderer);
-              },
             ),
             const SizedBox(height: 16),
             CustomButton(

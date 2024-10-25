@@ -25,14 +25,30 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var queryParams = GoRouterState.of(context).uri.queryParameters;
     return Scaffold(
       appBar: AppBar(
+        title: Text("${queryParams['roomId']}"),
+        leading: const Padding(
+          padding: EdgeInsets.all(8.0),
+          child: CircleAvatar(
+            radius: 28,
+            backgroundImage: NetworkImage(
+              "https://eu.ui-avatars.com/api/?name=Sa&size=150",
+            ),
+          ),
+        ),
         actions: [
           //call button
           IconButton(
             onPressed: () {
               kPrint("Call button pressed");
-              context.push(AppRoutes.calling);
+              context.pushNamed(
+                AppRoutes.callingNamed,
+                queryParameters: {
+                  'roomId': queryParams['roomId'],
+                },
+              );
             },
             icon: const Icon(Icons.call),
           ),

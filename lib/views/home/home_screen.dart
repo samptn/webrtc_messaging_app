@@ -1,33 +1,63 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:webrtc_messaging_app/models/room.dart';
+import '../../bloc/home_bloc.dart';
 import '../chat/chat_screen.dart';
 import '/routes/app_routes.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    context.read<HomeBloc>().add(LoadRooms());
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: ListView(
-        children: [
-          ...List.generate(
-            10,
-            (index) => const RoomItem(),
-          ),
-        ],
+      body: BlocBuilder<HomeBloc, HomeState>(
+        builder: (context, state) {
+          if (state is HomeLoaded) {
+            return ListView(
+              children: [
+                ...List.generate(
+                  state.rooms.length,
+                  (index) {
+                    var room = state.rooms[index];
+                    return RoomItem(
+                      room: room,
+                    );
+                  },
+                ),
+              ],
+            );
+          } else {
+            return Container();
+          }
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {},
+        child: const Icon(Icons.chat),
       ),
     );
   }
 }
 
 class RoomItem extends StatelessWidget {
-  final Room? room;
+  final Room room;
   const RoomItem({
     super.key,
-    this.room,
+    required this.room,
   });
 
   @override
@@ -93,7 +123,7 @@ class RoomItem extends StatelessWidget {
       ),
       onTap: () {
         var queryParams = {
-          'roomId': '123',
+          'roomId': room.roomId,
         };
         context.goNamed(
           AppRoutes.chatNamed,

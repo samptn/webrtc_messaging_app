@@ -20,6 +20,7 @@ class AppPages {
       ),
       GoRoute(
         path: AppRoutes.calling,
+        name: AppRoutes.callingNamed,
         builder: (_, __) => const CallingScreen(),
       ),
     ],

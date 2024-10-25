@@ -127,9 +127,11 @@ class _CallingScreenState extends State<CallingScreen>
 
 class CallStreamWidget extends StatelessWidget {
   final RTCVideoRenderer renderer;
+  final bool isMirror;
   const CallStreamWidget({
     super.key,
     required this.renderer,
+    this.isMirror = false,
   });
 
   @override
@@ -139,22 +141,27 @@ class CallStreamWidget extends StatelessWidget {
     return Container(
       width: width * 0.4,
       height: 240,
-      padding: const EdgeInsets.all(2),
+      padding: const EdgeInsets.all(0.0),
       decoration: BoxDecoration(
         // color: Colors.grey.shade900,
-        borderRadius: BorderRadius.circular(10.0),
+        borderRadius: BorderRadius.circular(8.0),
+        color: Colors.black,
         border: Border.all(
           color: Colors.grey.shade500,
           width: 2.0,
         ),
       ),
-      child: Stack(
-        children: [
-          RTCVideoView(
-            renderer,
-            objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
-          ),
-        ],
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(8.0),
+        child: Stack(
+          children: [
+            RTCVideoView(
+              renderer,
+              objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+              mirror: isMirror,
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -15,9 +15,10 @@ class AppPages {
       ),
       GoRoute(
         path: AppRoutes.chat,
+        name: AppRoutes.chatNamed,
         builder: (_, __) => const ChatScreen(),
       ),
-       GoRoute(
+      GoRoute(
         path: AppRoutes.calling,
         builder: (_, __) => const CallingScreen(),
       ),

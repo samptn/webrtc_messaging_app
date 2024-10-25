@@ -58,8 +58,10 @@ class _CallingScreenState extends State<CallingScreen>
 
   @override
   Widget build(BuildContext context) {
-    var queryParams = GoRouterState.of(context).uri.queryParameters;
-    var roomId = queryParams['roomId'] ?? 'default';
+    // var queryParams = GoRouterState.of(context).uri.queryParameters;
+    // var roomId = queryParams['roomId'] ?? 'default';
+    var roomId = "123";
+
     return Scaffold(
       appBar: AppBar(
         title: GestureDetector(
@@ -94,13 +96,6 @@ class _CallingScreenState extends State<CallingScreen>
             ),
             const SizedBox(height: 16),
             CustomButton(
-              label: "Join Call",
-              onPressed: () async {
-                await signaling.joinCall(roomId);
-              },
-            ),
-            const SizedBox(height: 16),
-            CustomButton(
               label: "Start Call",
               onPressed: () async {
                 var temp = await signaling.startCall(roomId: roomId);
@@ -111,9 +106,18 @@ class _CallingScreenState extends State<CallingScreen>
             ),
             const SizedBox(height: 16),
             CustomButton(
+              label: "Join Call",
+              onPressed: () async {
+                await signaling.joinCall(roomId);
+              },
+            ),
+            const SizedBox(height: 16),
+            CustomButton(
               label: "Hang Up",
               onPressed: () {
-                signaling.hangUp(_localRenderer, roomId: roomId);
+                signaling.hangUp(_localRenderer, roomId: roomId).then((value) {
+                  context.pop();
+                });
               },
             ),
           ],

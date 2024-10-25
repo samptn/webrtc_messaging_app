@@ -1,9 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:webrtc_messaging_app/routes/app_routes.dart';
+import '/routes/app_routes.dart';
 
 import '../../bloc/chat_bloc.dart';
 
@@ -246,10 +245,12 @@ var testMessages = const [
 ];
 
 class MessageBox extends StatelessWidget {
-  final void Function()? onTapSend;
+  final void Function(String? text)? onTapSend;
+  final TextEditingController? controller;
   const MessageBox({
     super.key,
     this.onTapSend,
+    this.controller,
   });
 
   @override
@@ -282,6 +283,7 @@ class MessageBox extends StatelessWidget {
           const SizedBox(width: 8),
           Expanded(
             child: TextField(
+              controller: controller,
               decoration: const InputDecoration(
                 hintText: 'Type a message...',
                 border: InputBorder.none,
@@ -296,7 +298,9 @@ class MessageBox extends StatelessWidget {
           // Send button
           const SizedBox(width: 16),
           GestureDetector(
-            onTap: onTapSend,
+            onTap: (){
+              onTapSend?.call(controller?.text);
+            },
             child: const Icon(
               Icons.send,
               color: Colors.blue,

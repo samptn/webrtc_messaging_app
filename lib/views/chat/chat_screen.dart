@@ -1,7 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:webrtc_messaging_app/routes/app_routes.dart';
+
+import '../../bloc/chat_bloc.dart';
 
 void kPrint(Object? data) {
   if (kDebugMode) {
@@ -17,9 +21,11 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
+  final _chatBloc = ChatBloc();
   @override
   void initState() {
     kPrint("OnInit $widget");
+    _chatBloc.add(LoadChat());
     super.initState();
   }
 
@@ -57,18 +63,23 @@ class _ChatScreenState extends State<ChatScreen> {
       body: Column(
         children: [
           Expanded(
-            child: ListView(
-              children: [
-                ...List.generate(
-                  testMessages.length,
-                  (index) => ChatBubble(
-                    message: testMessages[index].message,
-                    isMe: testMessages[index].isMe,
-                    time: testMessages[index].time,
-                    userImageUrl: testMessages[index].userImageUrl,
-                  ),
-                ),
-              ],
+            child: BlocBuilder<ChatBloc, ChatState>(
+              bloc: _chatBloc,
+              builder: (context, state) {
+                return ListView(
+                  children: [
+                    ...List.generate(
+                      testMessages.length,
+                      (index) => ChatBubbleWidget(
+                        message: testMessages[index].message,
+                        isMe: testMessages[index].isMe,
+                        time: testMessages[index].time,
+                        userImageUrl: testMessages[index].userImageUrl,
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
           ),
           const Padding(
@@ -81,13 +92,13 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 }
 
-class ChatBubble extends StatelessWidget {
+class ChatBubbleWidget extends StatelessWidget {
   final String message;
   final bool isMe;
   final String time;
   final String userImageUrl;
 
-  const ChatBubble({
+  const ChatBubbleWidget({
     super.key,
     required this.message,
     required this.isMe,
@@ -188,19 +199,19 @@ class ChatBubble extends StatelessWidget {
 }
 
 var testMessages = const [
-  ChatBubble(
+  ChatBubbleWidget(
     message: 'Hi!',
     isMe: true,
     time: '10:30 AM',
     userImageUrl: 'https://via.placeholder.com/160',
   ),
-  ChatBubble(
+  ChatBubbleWidget(
     message: 'Hey, how are you doing today?',
     isMe: false,
     time: '10:31 AM',
     userImageUrl: 'https://via.placeholder.com/160',
   ),
-  ChatBubble(
+  ChatBubbleWidget(
     message: 'I’ve been really busy lately with work and some personal stuff, '
         'but I’m doing well overall. It’s been a long week though. '
         'How about you? What have you been up to these days?',
@@ -208,7 +219,7 @@ var testMessages = const [
     time: '10:35 AM',
     userImageUrl: 'https://via.placeholder.com/160',
   ),
-  ChatBubble(
+  ChatBubbleWidget(
     message:
         'Hey! So I’ve been meaning to tell you about this amazing trip I had last weekend. '
         'We went hiking up the mountain, and it was such an incredible experience. '
@@ -220,13 +231,13 @@ var testMessages = const [
     time: '10:45 AM',
     userImageUrl: 'https://via.placeholder.com/160',
   ),
-  ChatBubble(
+  ChatBubbleWidget(
     message: 'Sure.',
     isMe: true,
     time: '10:40 AM',
     userImageUrl: 'https://via.placeholder.com/160',
   ),
-  ChatBubble(
+  ChatBubbleWidget(
     message: 'Great job! 👍',
     isMe: false,
     time: '10:42 AM',
@@ -235,7 +246,11 @@ var testMessages = const [
 ];
 
 class MessageBox extends StatelessWidget {
-  const MessageBox({super.key});
+  final void Function()? onTapSend;
+  const MessageBox({
+    super.key,
+    this.onTapSend,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -280,9 +295,12 @@ class MessageBox extends StatelessWidget {
 
           // Send button
           const SizedBox(width: 16),
-          const Icon(
-            Icons.send,
-            color: Colors.blue,
+          GestureDetector(
+            onTap: onTapSend,
+            child: const Icon(
+              Icons.send,
+              color: Colors.blue,
+            ),
           ),
         ],
       ),

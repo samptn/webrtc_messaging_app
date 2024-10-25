@@ -43,7 +43,7 @@ class _ChatScreenState extends State<ChatScreen> {
           IconButton(
             onPressed: () {
               kPrint("Call button pressed");
-              context.pushNamed(
+              context.goNamed(
                 AppRoutes.callingNamed,
                 queryParameters: {
                   'roomId': queryParams['roomId'],

@@ -17,6 +17,11 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     // Fetch rooms from Firebase or any other data source
     List<Room> rooms = [
       Room(
+        roomId: '123',
+        name: 'Flutter Devs',
+        creatorId: 'user1',
+      ),
+      Room(
         roomId: '${DateTime.now().microsecondsSinceEpoch}',
         name: 'Flutter Devs',
         creatorId: 'user1',

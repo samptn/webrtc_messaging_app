@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../../service/firebase_signaling.dart';
 
@@ -33,6 +34,7 @@ class _CallingScreenState extends State<CallingScreen>
   _initCall() async {
     await _localRenderer.initialize();
     await _remoteRenderer.initialize();
+    WakelockPlus.enable();
 
     signaling.onAddRemoteStream = ((stream) {
       setState(() {
@@ -137,6 +139,7 @@ class CallStreamWidget extends StatelessWidget {
     return Container(
       width: width * 0.4,
       height: 240,
+      padding: const EdgeInsets.all(2),
       decoration: BoxDecoration(
         // color: Colors.grey.shade900,
         borderRadius: BorderRadius.circular(10.0),
@@ -149,6 +152,7 @@ class CallStreamWidget extends StatelessWidget {
         children: [
           RTCVideoView(
             renderer,
+            objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
           ),
         ],
       ),

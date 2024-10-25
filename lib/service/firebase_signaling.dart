@@ -5,6 +5,7 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 import '../views/chat/chat_screen.dart';
 
+
 typedef StreamStateCallback = void Function(MediaStream stream);
 
 class Signaling {

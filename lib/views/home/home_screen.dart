@@ -13,7 +13,7 @@ class HomeScreen extends StatelessWidget {
       body: ListView(
         children: [
           ...List.generate(
-            10,     
+            10,
             (index) => const RoomItem(),
           ),
         ],
@@ -24,12 +24,12 @@ class HomeScreen extends StatelessWidget {
 
 class RoomItem extends StatelessWidget {
   const RoomItem({super.key});
-
+   
   @override
   Widget build(BuildContext context) {
     return ListTile(
       contentPadding:
-          const EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
+          const EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
       leading: const CircleAvatar(
         radius: 28,
         backgroundImage: NetworkImage(

@@ -42,6 +42,7 @@ dependencies:
   json_annotation: ^4.9.0
   build_runner: ^2.4.9
   flutter_webrtc: ^0.11.6+hotfix.1
+  wakelock_plus: ^1.2.8
 
 dev_dependencies:
   flutter_test:

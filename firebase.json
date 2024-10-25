@@ -1,1 +1,55 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"world-pff","appId":"1:475511500132:android:f0c597715fd0750decde71","fileOutput":"android/app/google-services.json"}},"ios":{"default":{"projectId":"world-pff","appId":"1:475511500132:ios:cede2eec80573c55ecde71","uploadDebugSymbols":false,"fileOutput":"ios/Runner/GoogleService-Info.plist"}},"macos":{"default":{"projectId":"world-pff","appId":"1:475511500132:ios:cede2eec80573c55ecde71","uploadDebugSymbols":false,"fileOutput":"macos/Runner/GoogleService-Info.plist"}},"dart":{"lib/firebase_options.dart":{"projectId":"world-pff","configurations":{"android":"1:475511500132:android:f0c597715fd0750decde71","ios":"1:475511500132:ios:cede2eec80573c55ecde71","macos":"1:475511500132:ios:cede2eec80573c55ecde71","web":"1:475511500132:web:8e202637ac1ce60becde71","windows":"1:475511500132:web:d9c7789a07fa05c1ecde71"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "world-pff",
+          "appId": "1:475511500132:android:f0c597715fd0750decde71",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "ios": {
+        "default": {
+          "projectId": "world-pff",
+          "appId": "1:475511500132:ios:cede2eec80573c55ecde71",
+          "uploadDebugSymbols": false,
+          "fileOutput": "ios/Runner/GoogleService-Info.plist"
+        }
+      },
+      "macos": {
+        "default": {
+          "projectId": "world-pff",
+          "appId": "1:475511500132:ios:cede2eec80573c55ecde71",
+          "uploadDebugSymbols": false,
+          "fileOutput": "macos/Runner/GoogleService-Info.plist"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "world-pff",
+          "configurations": {
+            "android": "1:475511500132:android:f0c597715fd0750decde71",
+            "ios": "1:475511500132:ios:cede2eec80573c55ecde71",
+            "macos": "1:475511500132:ios:cede2eec80573c55ecde71",
+            "web": "1:475511500132:web:8e202637ac1ce60becde71",
+            "windows": "1:475511500132:web:d9c7789a07fa05c1ecde71"
+          }
+        }
+      }
+    }
+  },
+  "hosting": {
+    "public": "build/web",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}

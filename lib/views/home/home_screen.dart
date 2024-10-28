@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:webrtc_messaging_app/models/room.dart';
@@ -44,6 +45,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     var room = state.rooms[index];
                     return RoomItem(
                       room: room,
+                      index: index,
                     );
                   },
                 ),
@@ -64,9 +66,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
 class RoomItem extends StatelessWidget {
   final Room room;
+  final int index;
   const RoomItem({
     super.key,
     required this.room,
+    required this.index,
   });
 
   @override
@@ -76,12 +80,15 @@ class RoomItem extends StatelessWidget {
         vertical: 0.0,
         horizontal: 16.0,
       ),
-      leading: const CircleAvatar(
+      leading: CircleAvatar(
         radius: 28,
         backgroundImage: NetworkImage(
-          "https://eu.ui-avatars.com/api/?name=Sa&size=150",
+          "https://picsum.photos/200/300?random=$index",
         ),
-      ),
+      ).animate().fadeIn(
+            duration: const Duration(milliseconds: 500),
+            delay: const Duration(milliseconds: 500),
+          ),
       title: const Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -141,6 +148,6 @@ class RoomItem extends StatelessWidget {
 
         kPrint('Tapped on room: Flutter Devs');
       },
-    );
+    ).animate().show();
   }
 }

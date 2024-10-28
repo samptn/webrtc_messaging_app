@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:webrtc_messaging_app/models/message.dart';
+import '/models/message.dart';
 import '/routes/app_routes.dart';
 
 import '../../bloc/chat_bloc.dart';
@@ -25,25 +25,22 @@ class _ChatScreenState extends State<ChatScreen> {
   final _chatBloc = ChatBloc();
   final messageController = TextEditingController();
   final _currentUser = FirebaseAuth.instance.currentUser;
-  @override
-  void initState() {
-    kPrint("OnInit $widget");
-    _chatBloc.add(LoadChat());
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
     var queryParams = GoRouterState.of(context).uri.queryParameters;
+    _chatBloc.add(LoadChat(roomId: '${queryParams['roomId']}'));
     return Scaffold(
       appBar: AppBar(
-        title: Text("${queryParams['roomId']}"),
+        title: Text(
+          "${queryParams['roomId']}",
+        ),
         leading: const Padding(
           padding: EdgeInsets.all(8.0),
           child: CircleAvatar(
             radius: 28,
             backgroundImage: NetworkImage(
-              "https://eu.ui-avatars.com/api/?name=Sa&size=150",
+              "https://picsum.photos/200/300?random=10",
             ),
             backgroundColor: Colors.deepPurple,
           ),
@@ -102,7 +99,8 @@ class _ChatScreenState extends State<ChatScreen> {
                 if (text.trim().isEmpty) {
                   return;
                 }
-                _chatBloc.add(SendMessage(message: text));
+                _chatBloc.add(SendMessage(
+                    message: text, roomId: '${queryParams['roomId']}'));
                 messageController.clear();
               },
               controller: messageController,
@@ -141,7 +139,9 @@ class ChatBubbleWidget extends StatelessWidget {
           if (!isMe)
             const CircleAvatar(
               radius: 12,
-              backgroundImage: NetworkImage("https://via.placeholder.com/160"),
+              backgroundImage: NetworkImage(
+                "https://picsum.photos/200/300?random=10",
+              ),
             ),
           if (!isMe) const SizedBox(width: 8),
           Flexible(
@@ -208,7 +208,9 @@ class ChatBubbleWidget extends StatelessWidget {
           if (isMe)
             const CircleAvatar(
               radius: 12,
-              backgroundImage: NetworkImage("https://via.placeholder.com/160"),
+              backgroundImage: NetworkImage(
+                "https://picsum.photos/200/300?random=10",
+              ),
             ),
         ],
       ),

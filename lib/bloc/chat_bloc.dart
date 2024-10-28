@@ -21,7 +21,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   Future<void> _loadChat(LoadChat event, Emitter<ChatState> emit) async {
     emit(ChatLoading());
 
-    final temp = await MessageService().getMessages('123');
+    final temp = await MessageService().getMessages(event.roomId);
 
     temp.sort((a, b) => a.timestamp!.compareTo(b.timestamp!));
     final messages = [...temp];
@@ -33,7 +33,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     final newMessage = Message(
       senderId: _currentUser?.uid,
       text: event.message,
-      roomId: '123',
+      roomId: event.roomId,
       timestamp: DateTime.now(),
     );
 

@@ -1,7 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:webrtc_messaging_app/models/message.dart';
 import '/routes/app_routes.dart';
 
 import '../../bloc/chat_bloc.dart';
@@ -21,6 +23,8 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   final _chatBloc = ChatBloc();
+  final messageController = TextEditingController();
+  final _currentUser = FirebaseAuth.instance.currentUser;
   @override
   void initState() {
     kPrint("OnInit $widget");
@@ -41,6 +45,7 @@ class _ChatScreenState extends State<ChatScreen> {
             backgroundImage: NetworkImage(
               "https://eu.ui-avatars.com/api/?name=Sa&size=150",
             ),
+            backgroundColor: Colors.deepPurple,
           ),
         ),
         actions: [
@@ -65,25 +70,43 @@ class _ChatScreenState extends State<ChatScreen> {
             child: BlocBuilder<ChatBloc, ChatState>(
               bloc: _chatBloc,
               builder: (context, state) {
-                return ListView(
-                  children: [
-                    ...List.generate(
-                      testMessages.length,
-                      (index) => ChatBubbleWidget(
-                        message: testMessages[index].message,
-                        isMe: testMessages[index].isMe,
-                        time: testMessages[index].time,
-                        userImageUrl: testMessages[index].userImageUrl,
+                if (state is ChatLoaded) {
+                  var messages = state.messages;
+                  return ListView(
+                    children: [
+                      ...List.generate(
+                        messages.length,
+                        (index) {
+                          var isMe =
+                              messages[index].senderId == _currentUser?.uid;
+                          return ChatBubbleWidget(
+                            message: messages[index],
+                            isMe: isMe,
+                          );
+                        },
                       ),
-                    ),
-                  ],
-                );
+                    ],
+                  );
+                }
+                return Container();
               },
             ),
           ),
-          const Padding(
-            padding: EdgeInsets.all(16.0),
-            child: MessageBox(),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: MessageBox(
+              onTapSend: (text) {
+                if (text == null) {
+                  return;
+                }
+                if (text.trim().isEmpty) {
+                  return;
+                }
+                _chatBloc.add(SendMessage(message: text));
+                messageController.clear();
+              },
+              controller: messageController,
+            ),
           ),
         ],
       ),
@@ -92,17 +115,13 @@ class _ChatScreenState extends State<ChatScreen> {
 }
 
 class ChatBubbleWidget extends StatelessWidget {
-  final String message;
+  final Message message;
   final bool isMe;
-  final String time;
-  final String userImageUrl;
 
   const ChatBubbleWidget({
     super.key,
     required this.message,
     required this.isMe,
-    required this.time,
-    required this.userImageUrl,
   });
 
   @override
@@ -120,9 +139,9 @@ class ChatBubbleWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           if (!isMe)
-            CircleAvatar(
+            const CircleAvatar(
               radius: 12,
-              backgroundImage: NetworkImage(userImageUrl),
+              backgroundImage: NetworkImage("https://via.placeholder.com/160"),
             ),
           if (!isMe) const SizedBox(width: 8),
           Flexible(
@@ -134,7 +153,7 @@ class ChatBubbleWidget extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
                   decoration: BoxDecoration(
-                    color: isMe ? Colors.blueAccent : Colors.grey[300],
+                    color: isMe ? Colors.deepPurple : Colors.grey[300],
                     borderRadius: BorderRadius.only(
                       topLeft: const Radius.circular(16),
                       topRight: const Radius.circular(16),
@@ -147,7 +166,7 @@ class ChatBubbleWidget extends StatelessWidget {
                     ),
                   ),
                   child: Text(
-                    message,
+                    message.text ?? "",
                     style: TextStyle(
                       color: isMe ? Colors.white : Colors.black,
                       fontSize: 16,
@@ -155,28 +174,28 @@ class ChatBubbleWidget extends StatelessWidget {
                     textAlign: TextAlign.justify,
                   ),
                 ),
-                const SizedBox(height: 4),
-                Container(
-                  // color: Colors.red,
-                  alignment:
-                      isMe ? Alignment.centerRight : Alignment.centerLeft,
-                  child: Wrap(
-                    children: [
-                      Image.network(
-                        "https://via.placeholder.com/160",
-                      ),
-                      Image.network(
-                        "https://via.placeholder.com/160",
-                      ),
-                      Image.network(
-                        "https://via.placeholder.com/160",
-                      ),
-                    ],
-                  ),
-                ),
+                // const SizedBox(height: 4),
+                // Container(
+                //   // color: Colors.red,
+                //   alignment:
+                //       isMe ? Alignment.centerRight : Alignment.centerLeft,
+                //   child: Wrap(
+                //     children: [
+                //       Image.network(
+                //         "https://via.placeholder.com/160",
+                //       ),
+                //       Image.network(
+                //         "https://via.placeholder.com/160",
+                //       ),
+                //       Image.network(
+                //         "https://via.placeholder.com/160",
+                //       ),
+                //     ],
+                //   ),
+                // ),
                 const SizedBox(height: 4),
                 Text(
-                  time,
+                  "${message.timestamp ?? ""}",
                   style: TextStyle(
                     fontSize: 12,
                     color: Colors.grey[600],
@@ -187,62 +206,15 @@ class ChatBubbleWidget extends StatelessWidget {
           ),
           if (isMe) const SizedBox(width: 8),
           if (isMe)
-            CircleAvatar(
+            const CircleAvatar(
               radius: 12,
-              backgroundImage: NetworkImage(userImageUrl),
+              backgroundImage: NetworkImage("https://via.placeholder.com/160"),
             ),
         ],
       ),
     );
   }
 }
-
-var testMessages = const [
-  ChatBubbleWidget(
-    message: 'Hi!',
-    isMe: true,
-    time: '10:30 AM',
-    userImageUrl: 'https://via.placeholder.com/160',
-  ),
-  ChatBubbleWidget(
-    message: 'Hey, how are you doing today?',
-    isMe: false,
-    time: '10:31 AM',
-    userImageUrl: 'https://via.placeholder.com/160',
-  ),
-  ChatBubbleWidget(
-    message: 'I’ve been really busy lately with work and some personal stuff, '
-        'but I’m doing well overall. It’s been a long week though. '
-        'How about you? What have you been up to these days?',
-    isMe: true,
-    time: '10:35 AM',
-    userImageUrl: 'https://via.placeholder.com/160',
-  ),
-  ChatBubbleWidget(
-    message:
-        'Hey! So I’ve been meaning to tell you about this amazing trip I had last weekend. '
-        'We went hiking up the mountain, and it was such an incredible experience. '
-        'The weather was perfect, the views were breathtaking, and I got some really great photos. '
-        'Honestly, I think it was one of the best trips I’ve ever had. We also found a hidden waterfall, '
-        'which wasn’t even on the map, and spent a couple of hours just relaxing there. '
-        'I wish I could show you the pictures right now!',
-    isMe: false,
-    time: '10:45 AM',
-    userImageUrl: 'https://via.placeholder.com/160',
-  ),
-  ChatBubbleWidget(
-    message: 'Sure.',
-    isMe: true,
-    time: '10:40 AM',
-    userImageUrl: 'https://via.placeholder.com/160',
-  ),
-  ChatBubbleWidget(
-    message: 'Great job! 👍',
-    isMe: false,
-    time: '10:42 AM',
-    userImageUrl: 'https://via.placeholder.com/160',
-  ),
-];
 
 class MessageBox extends StatelessWidget {
   final void Function(String? text)? onTapSend;
@@ -298,12 +270,12 @@ class MessageBox extends StatelessWidget {
           // Send button
           const SizedBox(width: 16),
           GestureDetector(
-            onTap: (){
+            onTap: () {
               onTapSend?.call(controller?.text);
             },
             child: const Icon(
               Icons.send,
-              color: Colors.blue,
+              color: Colors.deepPurple,
             ),
           ),
         ],

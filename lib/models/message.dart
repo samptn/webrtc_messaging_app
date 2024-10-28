@@ -5,13 +5,13 @@ part 'message.g.dart';
 @JsonSerializable(explicitToJson: true)
 class Message {
   final String? senderId;
-  final String? message;
+  final String? text;
   final String? roomId;
   final DateTime? timestamp;
 
   Message({
     this.senderId,
-    this.message,
+    this.text,
     this.roomId,
     this.timestamp,
   });
@@ -19,3 +19,5 @@ class Message {
       _$MessageFromJson(json);
   Map<String, dynamic> toJson() => _$MessageToJson(this);
 }
+
+

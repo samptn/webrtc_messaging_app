@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -14,10 +15,18 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final _auth = FirebaseAuth.instance;
   @override
   void initState() {
     context.read<HomeBloc>().add(LoadRooms());
+    _createAnonymousUser();
     super.initState();
+  }
+
+  _createAnonymousUser() async {
+    if (_auth.currentUser == null) {
+      await _auth.signInAnonymously();
+    }
   }
 
   @override
@@ -125,7 +134,7 @@ class RoomItem extends StatelessWidget {
         var queryParams = {
           'roomId': room.roomId,
         };
-        context.goNamed(
+        context.pushNamed(
           AppRoutes.chatNamed,
           queryParameters: queryParams,
         );

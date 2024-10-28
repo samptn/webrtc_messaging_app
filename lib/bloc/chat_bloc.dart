@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:meta/meta.dart';
+import '/service/message_service.dart';
 
 import '../models/message.dart';
 
@@ -9,6 +11,8 @@ part 'chat_event.dart';
 part 'chat_state.dart';
 
 class ChatBloc extends Bloc<ChatEvent, ChatState> {
+  final _currentUser = FirebaseAuth.instance.currentUser;
+
   ChatBloc() : super(ChatInitial()) {
     on<LoadChat>(_loadChat);
     on<SendMessage>(_sendMessage);
@@ -16,34 +20,26 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
 
   Future<void> _loadChat(LoadChat event, Emitter<ChatState> emit) async {
     emit(ChatLoading());
-    // TODO: Load chat messages from database or API
-    final messages = [
-      Message(
-        senderId: 'user1',
-        message: 'Hello!',
-        roomId: 'room1',
-        timestamp: DateTime.now(),
-      ),
-      Message(
-        senderId: 'user2',
-        message: 'Hi there!',
-        roomId: 'room1',
-        timestamp: DateTime.now(),
-      ),
-    ];
+
+    final temp = await MessageService().getMessages('123');
+
+    temp.sort((a, b) => a.timestamp!.compareTo(b.timestamp!));
+    final messages = [...temp];
     emit(ChatLoaded(messages: messages));
   }
 
   Future<void> _sendMessage(SendMessage event, Emitter<ChatState> emit) async {
-    // TODO: Send message to database or API
     final state = this.state as ChatLoaded;
     final newMessage = Message(
-      senderId: 'user1',
-      message: event.message,
-      roomId: 'room1',
+      senderId: _currentUser?.uid,
+      text: event.message,
+      roomId: '123',
       timestamp: DateTime.now(),
     );
+
     final updatedMessages = [...state.messages, newMessage];
+
+    MessageService().sendMessage(newMessage, "${_currentUser?.uid}");
     emit(state.copyWith(messages: updatedMessages));
   }
 }
